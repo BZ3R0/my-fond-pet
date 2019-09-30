@@ -1,19 +1,19 @@
 from app import db
 
-#By default nullable is set as false
+# By default nullable is set as false
 # Class used to create user table (users)
 class User(db.Model):
-    __tablename__ = "MFP_Users"
+    __tablename__ = "MFP_Adopt_User"
 
     id_user = db.Column(db.Integer, primary_key=True)
     ds_email = db.Column(db.String(256), unique=True)
     ds_password = db.Column(db.String(256))
     img_user = db.Column(db.String(256))
-    id_zipcode = db.Column(db.Integer, db.ForeignKey('id_zipcode'))
+    id_zipcode = db.Column(db.Integer, db.ForeignKey('Zipcode.id_zipcode'))
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=db.func.now())
     updated_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=db.func.now(), server_onupdate=db.func.now())
 
-    zipcode = db.relationship('ZipCode', foreign_keys=id_zipcode)
+    zipcode = db.relationship('Zipcode', foreign_keys=id_zipcode)
 
     def __init__(self, ds_email, ds_password, img_user, id_zipcodes):
         self.ds_email = ds_email
@@ -26,8 +26,8 @@ class User(db.Model):
 
 
 # Class used to create zipcode table (zipcodes)
-class ZipCode(db.Model):
-    __tablename__ = "MFP_Zipcode"
+class Zipcode(db.Model):
+    __tablename__ = "MFP_Adopt_Zipcode"
 
     id_zipcode = db.Column(db.Integer, primary_key=True)
     cd_zipcode = db.Column(db.String(8))
@@ -52,14 +52,14 @@ class ZipCode(db.Model):
 
 # Class used to create corporation table (corporations)
 class Corporation(db.Model):
-    __tablename__ = "MFP_Corporations"
+    __tablename__ = "MFP_Adopt_Corporation"
 
     id_corporation = db.Column(db.Integer, primary_key=True)
     ds_name = db.Column(db.String(256))
     nb_cnpj = db.Column(db.String(18), unique=True)
-    id_user = db.Column(db.Integer, db.ForeignKey('Users.id_user'))
+    id_user = db.Column(db.Integer, db.ForeignKey('User.id_user'))
 
-    users = db.relationship('User', foreign_keys=id_user)
+    user = db.relationship('User', foreign_keys=id_user)
 
     def __init__(self, ds_name, nb_cnpj, id_user):
         self.ds_name = ds_name
@@ -72,119 +72,121 @@ class Corporation(db.Model):
 
 # Class used to create individual table (individuals)
 class Individual(db.Model):
-    __tablename__ = "individuals"
+    __tablename__ = "MFP_Adpot_Individual"
 
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(100))
-    last_name = db.Column(db.String(100))
-    sex = db.Column(db.Boolean)
-    age = db.Column(db.Integer)
-    users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    id_individual = db.Column(db.Integer, primary_key=True)
+    ds_firstname = db.Column(db.String(100))
+    ds_lastname = db.Column(db.String(100))
+    nb_age = db.Column(db.Integer)
+    id_user = db.Column(db.Integer, db.ForeignKey('User.id_user'))
 
-    users = db.relationship('User', foreign_keys=users_id)
+    user = db.relationship('User', foreign_keys=id_user)
 
-    def __init__(self, first_name, last_name, sex, users_id):
-        self.first_name = first_name
-        self.last_name - last_name
-        self.sex = sex
-        self.users_id = users_id
+    def __init__(self, ds_firstname, ds_lastname, nb_age, id_user):
+        self.ds_firstname = ds_firstname
+        self.ds_lastname = ds_lastname
+        self.nb_age = nb_age
+        self.id_user = id_user
 
     def __repr__(self):
-        return "<Individual %r>" % self.first_name
+        return "<id_individual='%i', ds_firstname='%s', ds_lastname='%s', nb_age='%i', id_user='%i'>" % (self.id_individual, self.ds_firstname, self.ds_lastname, self.nb_age, self.id_user)
 
 
 # Class used to create contact type table (contact_types)
 class ContactType(db.Model):
-    __tablename__ = "contact_types"
+    __tablename__ = "MFP_Adopt_ContactType"
 
-    id = db.Column(db.Integer, primary_key=True)
-    telephone = db.Column(db.String(12))
-    users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    id_contactType = db.Column(db.Integer, primary_key=True)
+    nb_telephone = db.Column(db.String(15))
+    id_user = db.Column(db.Integer, db.ForeignKey('User.id_user'))
 
-    users = db.relationship('User', foreign_keys=users_id)
+    user = db.relationship('User', foreign_keys=id_user)
 
-    def __init__(self, users_id):
-        self.users_id = users_id
+    def __init__(self, nb_telephone, id_user):
+        self.nb_telephone = nb_telephone
+        self.id_user = id_user
 
     def __repr__(self):
-        return "<ContactType %r>" % self.telephone
+        return "<id_contactType='%i', nb_telephone='%s', id_user='%i'>" % (self.id_contactType, self.nb_telephone, self.id_user)
 
 
 # Class used to create pet table (pets)
 class Pet(db.Model):
-    __tablename__ = "pets"
+    __tablename__ = "MFP_Adpot_Pet"
 
-    id = db.Column(db.Integer, primary_key=True)
-    pet_types_id = db.Column(db.Integer, db.ForeignKey('pet_types.id'))
-    users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    age = db.Column(db.Integer)
-    info = db.Column(db.String(400))
-    sex = db.Column(db.Boolean)
-    status = db.Column(db.Boolean)
-    hair_size = db.Column(db.Boolean)
-    weight = db.Column(db.Integer)
-    breeds_id = db.Column(db.Integer, db.ForeignKey('breeds.id'))
+    id_pet = db.Column(db.Integer, primary_key=True)
+    ds_info = db.Column(db.Text)
+    nb_age = db.Column(db.Integer)
+    op_sex = db.Column(db.Boolean)
+    op_hairSize = db.Column(db.Integer)
+    nb_weight = db.Column(db.Integer)
+    st_adoption = db.Column(db.Boolean)
+    id_breed = db.Column(db.Integer, db.ForeignKey('Breed.id_breed'))
+    id_user = db.Column(db.Integer, db.ForeignKey('User.id_user'))
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=db.func.now(), server_onupdate=db.func.now())
 
-    pet_types = db.relationship('PetType', foreign_keys=pet_types_id)
-    users = db.relationship('User', foreign_keys=users_id)
-    breeds = db.relationship('Breed', foreign_keys=breeds_id)
+    user = db.relationship('User', foreign_keys=id_user)
+    breed = db.relationship('Breed', foreign_keys=id_breed)
 
-    def __init__(self, pet_types_id, users_id, age, sex, status, breeds_id):
-        self.pet_types_id = pet_types_id
-        self.users_id = users_id
-        self.age = age
-        self.sex = sex
-        self.status = status
-        self.breeds_id = breeds_id
+    def __init__(self, ds_info, nb_age, op_sex, op_hairSize, nb_weight, st_adoption, id_breed, id_user):
+        self.ds_info = ds_info
+        self.nb_age = nb_age
+        self.op_sex = op_sex
+        self.op_hairSize = op_hairSize
+        self.nb_weight = nb_weight
+        self.st_adoption = st_adoption
+        self.id_breed = id_breed
+        self.id_user = id_user
 
     def __repr__(self):
-        return "<Pet %r>" % self.pet_types_id
+        return "<id_pet='%i', id_user='%i', nb_age='%i', op_sex='%s', st_adoption='%s', op_hairSize='%s', nb_weight='%s', id_breed='%i'>" % (self.id_pet, self.id_user, self.nb_age, self.op_sex, self.st_adoption, self.op_hairSize, self.nb_weight, self.id_breed)
 
 
 # Class used to create pet type table (pet_types)
 class PetType(db.Model):
-    __tablename__ = "pet_types"
+    __tablename__ = "MFP_Adopt_PetType"
 
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(50))
-    pet_categories_id = db.Column(db.Integer, db.ForeignKey('pet_categories.id'))
+    id_petType = db.Column(db.Integer, primary_key=True)
+    ds_name = db.Column(db.String(256))
+    id_petCategory = db.Column(db.Integer, db.ForeignKey('PetCategory.id_petCategory'))
 
-    pet_categories = db.relationship('PetCategory', foreign_keys=pet_categories_id)
+    petCategory = db.relationship('PetCategory', foreign_keys=id_petCategory)
 
-    def __init__(self, type, pet_categories_id):
-        self.type = type
-        self.pet_categories_id = pet_categories_id
+    def __init__(self, ds_name, id_petCategory):
+        self.ds_name = ds_name
+        self.id_petCategory = id_petCategory
 
     def __repr__(self):
-        return "<PetType %r>" % self.type
+        return "<id_petType='%i', ds_name='%s', id_petCategory='%i'>" % (self.id_petType, self.ds_name, self.id_petCategory)
 
 
 # Class used to create pet category table (pet_categories)
 class PetCategory(db.Model):
-    __tablename__ = "pet_categories"
+    __tablename__ = "MFP_Adopt_Category"
 
-    id = db.Column(db.Integer, primary_key=True)
-    category = db.Column(db.String(50))
+    id_petCategory = db.Column(db.Integer, primary_key=True)
+    ds_name = db.Column(db.String(256))
 
-    def __init__(self, category):
-        self.category = category
+    def __init__(self, ds_name):
+        self.ds_name = ds_name
 
     def __repr__(self):
-        return "<PetCategory %r>" % self.category
+        return "<id_petCategory='%i', ds_name='%s'>" % (self.id_petCategory, self.ds_name)
 
 
 # Class used to create breed table (breeds)
 class Breed(db.Model):
-    __tablename__ = "breeds"
+    __tablename__ = "MFP_Adopt_Breed"
 
-    id = db.Column(db.Integer, primary_key=True)
-    ds_breed = db.Column(db.String(45))
+    id_breed = db.Column(db.Integer, primary_key=True)
+    ds_name = db.Column(db.String(256))
 
-    def __init__(self, ds_breed):
-        self.ds_breed = ds_breed
+    def __init__(self, ds_name):
+        self.ds_name = ds_name
 
     def __repr__(self):
-        return "<Breed %r>" % self.ds_breed
+        return "<id_breed='%i', ds_name='%s'>" % (self.id_breed, self.ds_name)
 
 
 # Class used to create adoption table (adoptions)
@@ -195,7 +197,8 @@ class Adoption(db.Model):
     pets_id = db.Column(db.Integer, db.ForeignKey('pets.id'))
     pets_users_id = db.Column(db.Integer, db.ForeignKey('pets.users_id'))
     users_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    date = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=db.func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=db.func.now(), server_onupdate=db.func.now())
 
     pets = db.relationship('Pet', foreign_keys=pets_id)
     pets_users = db.relationship('Pet', foreign_keys=pets_users_id)
